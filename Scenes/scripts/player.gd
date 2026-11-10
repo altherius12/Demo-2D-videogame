@@ -6,27 +6,31 @@ extends CharacterBody2D
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 func _ready() -> void:
-	# Inicia la animación de tu personaje al comenzar el juego
+	# El robot empieza quieto sin reproducir la animación
 	if animated_sprite:
-		animated_sprite.play("idle_down")
+		animated_sprite.stop()
+		animated_sprite.frame = 0
 
 func _physics_process(_delta: float) -> void:
-	# Obtener la dirección horizontal (-1 izquierda, 1 derecha, 0 quieto)
-	# Usamos las acciones 'move_left' (tecla A) y 'move_right' (tecla D) que configuraste
+	# Detecta si se pulsa 'A' (move_left) o 'D' (move_right)
 	var direction := Input.get_axis("move_left", "move_right")
 
-	# Si no se presiona A/D, permitimos también usar las flechas del teclado
-	if direction == 0.0:
-		direction = Input.get_axis("ui_left", "ui_right")
-
-	# Aplicar velocidad según la dirección
+	# Si se pulsa A o D
 	if direction != 0.0:
 		velocity.x = direction * speed
-		# Voltear el sprite horizontalmente al cambiar de dirección
+		# Orientar el sprite a la dirección correspondiente
 		animated_sprite.flip_h = direction < 0.0
+		
+		# Reproducir la animación de caminar mientras se mueva
+		if not animated_sprite.is_playing():
+			animated_sprite.play("idle_down")
 	else:
-		# Frenar suavemente cuando no se presione ninguna tecla
-		velocity.x = move_toward(velocity.x, 0.0, speed)
+		# Detener el movimiento inmediatamente al soltar las teclas
+		velocity.x = 0.0
+		
+		# Detener la animación y volver a la pose de reposo
+		if animated_sprite.is_playing():
+			animated_sprite.stop()
+			animated_sprite.frame = 0
 
-	# Mover el CharacterBody2D usando el motor de físicas de Godot
 	move_and_slide()
