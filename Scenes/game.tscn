@@ -6,7 +6,3 @@
 
 [node name="player" parent="." unique_id=907654423 instance=ExtResource("1_ebmjs")]
 position = Vector2(1, 1)
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=2113791671]
-position = Vector2(0, -24)
-zoom = Vector2(5, 5)
