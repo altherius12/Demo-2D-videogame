@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cys8b0u2davj3" path="res://Main_Robot_01.png" id="2_cvnsp"]
 [ext_resource type="Texture2D" uid="uid://kbidugvc23xd" path="res://Animation main/Main_Robot_Quiet.png" id="3_quiet"]
 [ext_resource type="Texture2D" uid="uid://busuc61ffa6ul" path="res://Animation main/Sprite-Forehead.png" id="3_vgqql"]
+[ext_resource type="Texture2D" uid="uid://c0u5nc4gbdjcd" path="res://weapon.png" id="5_weapon"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ypfnu"]
 atlas = ExtResource("3_quiet")
