@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dktyl8mgi1y60"
-path="res://.godot/imported/Main_Robot_Forehead.png-e0b3f628aab4503b6bd53748914ed729.ctex"
+uid="uid://2c7eme7mj413"
+path="res://.godot/imported/bullet.png-ff1424653e10246c11e3724e402c519e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Animation main/Main_Robot_Forehead.png"
-dest_files=["res://.godot/imported/Main_Robot_Forehead.png-e0b3f628aab4503b6bd53748914ed729.ctex"]
+source_file="res://bullet.png"
+dest_files=["res://.godot/imported/bullet.png-ff1424653e10246c11e3724e402c519e.ctex"]
 
 [params]
 

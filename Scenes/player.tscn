@@ -3,39 +3,6 @@
 [ext_resource type="Script" uid="uid://2pb78gldd4gp" path="res://Scenes/scripts/player.gd" id="1_cvnsp"]
 [ext_resource type="Texture2D" uid="uid://cys8b0u2davj3" path="res://Main_Robot_01.png" id="2_cvnsp"]
 [ext_resource type="Texture2D" uid="uid://kbidugvc23xd" path="res://Animation main/Main_Robot_Quiet.png" id="3_quiet"]
-[ext_resource type="Texture2D" uid="uid://dktyl8mgi1y60" path="res://Animation main/Main_Robot_Forehead.png" id="4_forehead"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fh_0"]
-atlas = ExtResource("4_forehead")
-region = Rect2(0, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fh_1"]
-atlas = ExtResource("4_forehead")
-region = Rect2(64, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fh_2"]
-atlas = ExtResource("4_forehead")
-region = Rect2(128, 0, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fh_3"]
-atlas = ExtResource("4_forehead")
-region = Rect2(0, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fh_4"]
-atlas = ExtResource("4_forehead")
-region = Rect2(64, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fh_5"]
-atlas = ExtResource("4_forehead")
-region = Rect2(128, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fh_6"]
-atlas = ExtResource("4_forehead")
-region = Rect2(0, 128, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fh_7"]
-atlas = ExtResource("4_forehead")
-region = Rect2(64, 128, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ypfnu"]
 atlas = ExtResource("3_quiet")
@@ -194,31 +161,7 @@ animations = [{
 "name": &"Idle_stay",
 "speed": 9.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fh_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fh_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fh_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fh_3")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fh_4")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fh_5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fh_6")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fh_7")
-}],
+"frames": [],
 "loop": true,
 "name": &"idle_forehead",
 "speed": 9.0
@@ -317,10 +260,12 @@ height = 52.0
 script = ExtResource("1_cvnsp")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1489960790]
-position = Vector2(3, -32)
+position = Vector2(0, -26.999998)
+scale = Vector2(0.88000166, 0.8399991)
 sprite_frames = SubResource("SpriteFrames_vfarp")
 animation = &"new_animation"
-autoplay = "Idle_stay"
+frame = 1
+frame_progress = 0.024970017
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=232587328]
 position = Vector2(0, -25)
@@ -331,3 +276,12 @@ position = Vector2(0, -24)
 zoom = Vector2(5, 5)
 position_smoothing_enabled = true
 position_smoothing_speed = 7.0
+
+[node name="WeaponPivot" type="Node2D" parent="."]
+position = Vector2(0, -22)
+
+[node name="WeaponSprite" type="Sprite2D" parent="WeaponPivot"]
+position = Vector2(11, 0)
+
+[node name="Muzzle" type="Marker2D" parent="WeaponPivot"]
+position = Vector2(20, -1)
