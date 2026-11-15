@@ -1,10 +1,11 @@
 extends CharacterBody2D
 
 @export var speed: float = 150.0
-@export var max_walk_frames: int = 4
-@export var walk_animation: StringName = &"new_animation"
-@export var idle_animation: StringName = &"Idle_stay"
+@export var max_walk_frames: int = 0
+@export var walk_animation: StringName = &"idle_Right"
+@export var idle_animation: StringName = &"idle_Right"
 @export var forehead_animation: StringName = &"idle_forehead"
+@export var flip_with_mouse_when_idle: bool = false
 
 @export_group("Weapon Settings")
 @export var bullet_scene: PackedScene = preload("res://Scenes/bullet.tscn")
@@ -23,11 +24,11 @@ var _fire_cooldown: float = 0.0
 var _weapon_base_x: float = 11.0
 
 func _ready() -> void:
+	_setup_weapon()
 	if animated_sprite:
 		if not animated_sprite.frame_changed.is_connected(_on_frame_changed):
 			animated_sprite.frame_changed.connect(_on_frame_changed)
 		_play_idle()
-	_setup_weapon()
 
 func _physics_process(delta: float) -> void:
 	var pressing_s := Input.is_action_pressed("move_down") or Input.is_physical_key_pressed(KEY_S)
@@ -41,18 +42,22 @@ func _physics_process(delta: float) -> void:
 			animated_sprite.flip_h = false
 			_play_forehead()
 	elif direction != 0.0:
-		# Al moverse con A o D, deja de mirar de frente y camina hacia los lados
+		# Al moverse con A o D, deja de mirar de frente y camina sincronizando los ojos con el mouse
 		_is_looking_front = false
 		velocity.x = direction * speed
 		if animated_sprite:
-			animated_sprite.flip_h = direction < 0.0
+			# Sprite_Right_Sync mira hacia la izquierda sin voltear (flip_h = false)
+			animated_sprite.flip_h = direction > 0.0
 			_play_walk()
 	else:
-		# Detenido: mantiene idle_forehead si se pulsó S, o Idle_stay si venía caminando
+		# Detenido: mantiene idle_forehead si se pulsó S, o idle_Right sincronizado con el mouse
 		velocity.x = 0.0
 		if _is_looking_front:
 			_play_forehead()
 		else:
+			if flip_with_mouse_when_idle and animated_sprite:
+				var ref_pos := weapon_pivot.global_position if weapon_pivot else animated_sprite.global_position
+				animated_sprite.flip_h = get_global_mouse_position().x > ref_pos.x
 			_play_idle()
 
 	move_and_slide()
@@ -177,13 +182,15 @@ func _play_forehead() -> void:
 func _play_walk() -> void:
 	if not animated_sprite or not animated_sprite.sprite_frames:
 		return
-	
-	var anim_to_play := _get_walk_animation_name()
-	if anim_to_play == &"":
+
+	if walk_animation == &"idle_Right":
+		var synced_anim := _get_mouse_synced_idle_animation_name()
+		_play_animation(synced_anim, true)
 		return
 
-	if not animated_sprite.is_playing() or animated_sprite.animation != anim_to_play:
-		animated_sprite.play(anim_to_play)
+	var anim_to_play := _get_walk_animation_name()
+	if anim_to_play != &"":
+		_play_animation(anim_to_play, false)
 
 func _play_idle() -> void:
 	if not animated_sprite or not animated_sprite.sprite_frames:
@@ -191,12 +198,28 @@ func _play_idle() -> void:
 
 	var anim_to_play := _get_idle_animation_name()
 	if anim_to_play != &"":
-		if not animated_sprite.is_playing() or animated_sprite.animation != anim_to_play:
-			animated_sprite.play(anim_to_play)
+		_play_animation(anim_to_play, anim_to_play.begins_with("idle_Right"))
 	else:
 		if animated_sprite.is_playing():
 			animated_sprite.stop()
 		animated_sprite.frame = 0
+
+func _play_animation(anim_to_play: StringName, preserve_frame: bool) -> void:
+	if anim_to_play == &"" or not animated_sprite or not animated_sprite.sprite_frames:
+		return
+	if not animated_sprite.sprite_frames.has_animation(anim_to_play):
+		return
+
+	if animated_sprite.animation != anim_to_play:
+		var prev_frame := animated_sprite.frame
+		var prev_progress := animated_sprite.frame_progress
+		animated_sprite.play(anim_to_play)
+		if preserve_frame:
+			var frame_count := animated_sprite.sprite_frames.get_frame_count(anim_to_play)
+			if frame_count > 0:
+				animated_sprite.set_frame_and_progress(prev_frame % frame_count, prev_progress)
+	elif not animated_sprite.is_playing():
+		animated_sprite.play(anim_to_play)
 
 func _get_forehead_animation_name() -> StringName:
 	if not animated_sprite or not animated_sprite.sprite_frames:
@@ -219,7 +242,12 @@ func _get_forehead_animation_name() -> StringName:
 func _get_idle_animation_name() -> StringName:
 	if not animated_sprite or not animated_sprite.sprite_frames:
 		return &""
-	
+
+	if idle_animation == &"idle_Right":
+		var synced_anim := _get_mouse_synced_idle_animation_name()
+		if synced_anim != &"":
+			return synced_anim
+
 	if animated_sprite.sprite_frames.has_animation(idle_animation) \
 	and animated_sprite.sprite_frames.get_frame_count(idle_animation) > 0:
 		return idle_animation
@@ -236,6 +264,41 @@ func _get_idle_animation_name() -> StringName:
 		if "idle" in anim.to_lower() and animated_sprite.sprite_frames.get_frame_count(anim) > 0:
 			return anim
 	
+	return &""
+
+func _get_mouse_synced_idle_animation_name() -> StringName:
+	if not animated_sprite or not animated_sprite.sprite_frames:
+		return &""
+
+	var origin := weapon_pivot.global_position if weapon_pivot else animated_sprite.global_position
+	var aim := get_global_mouse_position() - origin
+	# Sprite_Right_Sync mira hacia la izquierda cuando flip_h = false
+	if animated_sprite.flip_h:
+		aim.x = -aim.x
+
+	var angle_deg := rad_to_deg(atan2(aim.y, aim.x))
+	var target_anim: StringName
+	if absf(angle_deg) >= 150.0:
+		target_anim = &"idle_Right"
+	elif angle_deg >= -150.0 and angle_deg < -105.0:
+		target_anim = &"idle_Right_up_forward"
+	elif angle_deg >= -105.0 and angle_deg < -30.0:
+		target_anim = &"idle_Right_up"
+	elif absf(angle_deg) <= 30.0:
+		target_anim = &"idle_Right_back"
+	elif angle_deg > 30.0 and angle_deg <= 105.0:
+		target_anim = &"idle_Right_down"
+	else:
+		target_anim = &"idle_Right_down_forward"
+
+	if animated_sprite.sprite_frames.has_animation(target_anim) \
+	and animated_sprite.sprite_frames.get_frame_count(target_anim) > 0:
+		return target_anim
+
+	if animated_sprite.sprite_frames.has_animation(&"idle_Right") \
+	and animated_sprite.sprite_frames.get_frame_count(&"idle_Right") > 0:
+		return &"idle_Right"
+
 	return &""
 
 func _get_walk_animation_name() -> StringName:
