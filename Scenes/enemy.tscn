@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://ehi8lntgugts"]
+
+[ext_resource type="Script" uid="uid://ci8u1i6ok2mjr" path="res://Scenes/scripts/enemy.gd" id="1_enemy"]
+[ext_resource type="Texture2D" uid="uid://ciuk1npl0x6ox" path="res://Animation main/enemy.png" id="2_enemy_tex"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_enemy_0"]
+atlas = ExtResource("2_enemy_tex")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_enemy_1"]
+atlas = ExtResource("2_enemy_tex")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_enemy_2"]
+atlas = ExtResource("2_enemy_tex")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_enemy_3"]
+atlas = ExtResource("2_enemy_tex")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_enemy_4"]
+atlas = ExtResource("2_enemy_tex")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_enemy"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_enemy_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_enemy_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_enemy_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_enemy_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_enemy_4")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 9.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 12.0
+
+[node name="Enemy" type="CharacterBody2D" unique_id=1252202617 groups=["enemies"]]
+script = ExtResource("1_enemy")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=288534892]
+sprite_frames = SubResource("SpriteFrames_enemy")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=765410783]
+shape = SubResource("CircleShape2D_enemy")
+
+[node name="Hitbox" type="Area2D" parent="."]
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_hitbox")
+
+[node name="HealthBarBg" type="ColorRect" parent="." unique_id=155581062]
+z_index = 2
+offset_left = -11.000001
+offset_top = -13.0
+offset_right = 8.999999
+offset_bottom = -9.0
+scale = Vector2(1.11, 1.11)
+color = Color(0.05, 0.05, 0.08, 0.9)
+
+[node name="HealthBarFill" type="ColorRect" parent="HealthBarBg" unique_id=2000708331]
+layout_mode = 0
+offset_left = 0.9009012
+offset_top = 0.9009012
+offset_right = 18.900902
+offset_bottom = 2.9009013
+color = Color(0.9999998, 0.15707102, 0.63558155, 1)

@@ -1,7 +1,9 @@
 extends Area2D
 
-@export var speed: float = 420.0
+@export var speed: float = 240.0
 @export var lifetime: float = 2.0
+@export var damage: int = 1
+@export var is_editor_preview: bool = false
 
 var direction: Vector2 = Vector2.RIGHT
 
@@ -10,7 +12,15 @@ var direction: Vector2 = Vector2.RIGHT
 func _ready() -> void:
 	if sprite and not sprite.texture:
 		sprite.texture = _create_bullet_texture()
-	
+
+	if is_editor_preview:
+		# Nodo de referencia visible solo en el editor; no dispara ni colisiona al iniciar el juego
+		hide()
+		set_physics_process(false)
+		set_deferred("monitoring", false)
+		set_deferred("monitorable", false)
+		return
+
 	# Destruir el proyectil automáticamente después de su tiempo de vida
 	get_tree().create_timer(lifetime).timeout.connect(queue_free)
 	body_entered.connect(_on_body_entered)
@@ -20,8 +30,10 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(body: Node) -> void:
 	# Evitar que colisione con el propio jugador
-	if body.name == "player" or body is CharacterBody2D:
+	if body.name == "player" or body.is_in_group("player"):
 		return
+	if body.has_method("take_damage"):
+		body.take_damage(damage)
 	queue_free()
 
 func _create_bullet_texture() -> Texture2D:
